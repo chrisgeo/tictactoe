@@ -26,7 +26,6 @@ var GameState = function(config) {
     newState.board = $.extend({}, board);
     newState.board.placePlayer(player, position);
     checkForWin(newState.board);
-    console.log(winner);
     return newState;
   }
 
@@ -42,21 +41,31 @@ var GameState = function(config) {
     return found;
   }
   /*** check for winning functions ***/
-  function isWon(piece) {
-    return _.isEqual(piece, winner);
+  function didIWin(piece){
+    return checkForWin(piece);
+  }
+
+  function getWinner(){
+    return checkForWin(player) || checkForWin(opponent);
+  }
+
+  function isWon() {
+    return (
+        checkForWin(player) || checkForWin(opponent)
+    ) ? true : false;
   }
 
   function isLost(piece){
-    return winner && !_.isEqual(winner, piece);
+    return !isDraw() && isWon();
   }
 
   function isDraw() {
     // no empty spaces and no winner
-    return !board.getEmptySpacesLeft() && !winner;
+    return !board.getEmptySpacesLeft() && isWon();
   }
 
   function gameOver (){
-    return winner || isDraw();
+    return isWon() || isDraw();
   }
 
   function finishThem(){
@@ -170,6 +179,7 @@ var GameState = function(config) {
           row: i, col: j
         });
         if(_.isEqual(piece, occupiedBy)){
+          console.log(piece, occupiedBy);
           count++;
         }
 
@@ -187,6 +197,7 @@ var GameState = function(config) {
     var count = 0,
       i = 0;
 
+    console.log(piece);
     for( ; i < board.width; i++){
       var j = 0;
       for(; j < board.width; j++){
@@ -208,8 +219,23 @@ var GameState = function(config) {
   }
 
   function winningDiagonal(piece){
-    var count = 0;
+    var count = 0,
+      i = 0;
 
+    for(; i < board.width; i++){
+      var occupiedBy = board.whosThere({
+        row: i,
+        col: i
+      });
+
+      if(_.isEqual(piece, occupiedBy)){
+        count++;
+      }
+
+      if(count === board.width){
+        return piece;
+      }
+    }
   }
 
   function winningRevDiagonal(piece){
@@ -226,20 +252,20 @@ var GameState = function(config) {
           count ++;
         }
 
-        if(count === 3){
+        if(count === board.width){
           return piece;
         }
       }
   }
 
-  function checkForWin(board){
-    // go across rows
+  function checkForWin(piece){
+    winner =
+      winningRow(piece) ||
+      winningColumn(piece) ||
+      winningDiagonal(piece) ||
+      winningRevDiagonal(piece);
 
-    // go over columns
-
-    // find diagonals
-
-    // is there are no empty spaces, tie.
+    return winner;
   }
 
   function availableMoves(){
@@ -272,6 +298,8 @@ var GameState = function(config) {
 
   return {
     blankBoard: blankBoard,
+    getWinner: getWinner,
+    didIWin: didIWin,
     isWon: isWon,
     isDraw: isDraw,
     isLost: isLost,

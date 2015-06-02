@@ -13,7 +13,6 @@ var PrefectComputerPlayer = function(config){
 
 
   function takeTurn(state){
-    console.log(state);
     if(state.gameOver()){
       return state;
     }
