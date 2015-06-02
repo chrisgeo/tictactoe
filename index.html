@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>TicTacToe</title>
+    <!-- vendor.css -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="./styles/index.css">
+</head>
+<body>
+  <div class="container">
+    <div class="row text-center">
+      <h1 class="subheader">Tic Tac Toe</h1>
+      <h4 class="subheader">Computer vs You: Who will win?</h4>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-8 board-container">
+           <table id="board" class="board text-center">
+             <tbody></tbody>
+           </table>
+        </div>
+    </div>
+    <div class="footer row text-center">
+      <div class="col-xs-6 col-sm-4">
+        <a href="#" class="computer-start hal-9000 start-button">
+          <i class="fa fa-tablet fa-5x"></i>
+          <p>HAL9000 Starts</p>
+        </a>
+      </div>
+      <div class="col-xs-6 col-sm-4">
+        <h3 class="subheader">Who starts?</h3>
+      </div>
+      <div class="col-xs-6 col-sm-4">
+        <a href="#" class="you-start purple-people-eater start-button">
+          <i class="fa fa-user-md fa-5x"></i>
+          <p>Me. Duh.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+  <script src="./scripts/modernizer.js" type="text/javascript"></script>
+  <script src="./scripts/lodash.min.js" type="text/javascript"></script>
+  <script src="http://code.jquery.com/jquery-2.1.4.js" type="text/javascript"></script>
+  <script src="./scripts/utils.js" type="text/javascript"></script>
+  <script src="./scripts/board.js" type="text/javascript"></script>
+  <script src="./scripts/game-state.js" type="text/javascript"></script>
+  <script src="./scripts/player.js" type="text/javascript"></script>
+  <script src="./scripts/tictactoe.js" type="text/javascript"></script>
+</body>
+</html>

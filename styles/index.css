@@ -1,0 +1,89 @@
+a, a:hover, a:visited {
+  text-decoration: none;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.subheader {
+  line-height: 1.4;
+  color: #6f6f6f;
+  font-weight: 300;
+  margin-top: 0.2em;
+  margin-bottom: 0.5em;
+}
+
+.computer,
+.hal-9000,
+.hal-9000:hover,
+.hal-9000:active,
+.hal-9000:visited,
+.hal-9000:focus {
+  color: #5C9104;
+  text-decoration: none;
+}
+
+.hover .computer:hover,
+.hal-9000:hover {
+  color: #4D7B02;
+}
+
+.human,
+.purple-people-eater,
+.purple-people-eater:hover,
+.purple-people-eater:active,
+.purple-people-eater:visited,
+.purple-people-eater:focus {
+  color: #66D9EF;
+  text-decoration: none;
+}
+
+.hover .human:hover,
+.purple-people-eater:hover {
+  color: #45B4EA;
+  text-decoration: none;
+}
+
+.board {
+  width: 100%;
+  max-width: 100%;
+}
+
+.space {
+  height: 100px;
+  line-height: 100px;
+  width: 33.33%;
+  font-size: 4em;
+  cursor: pointer;
+}
+
+.space.taken {
+  cursor: none;
+}
+
+.hover {
+  opacity: 0.5;
+}
+
+.top-left,
+.top-center,
+.top-right,
+.middle-left,
+.middle-center,
+.middle-right {
+    border-bottom: 2px solid #A3A9AF;
+}
+
+.top-left,
+.top-center,
+.middle-left,
+.middle-center,
+.bottom-left,
+.bottom-center {
+    border-right: 2px solid #A3A9AF;
+}
+
+.board-container {
+  padding: 20px 0;
+}
