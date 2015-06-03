@@ -19,6 +19,7 @@ var GameState = function(config) {
   }
 
   function makeMove(position) {
+    // this is causing slowness
     var newState = new GameState({
       board: cloneGameBoard(board),
       player: player,
@@ -30,7 +31,7 @@ var GameState = function(config) {
 
   /*** check for winning functions ***/
   function didIWin(piece){
-    return checkForWin(piece);
+    return checkForWin(piece) !== undefined;
   }
 
   function didILose(piece){
@@ -53,7 +54,7 @@ var GameState = function(config) {
 
   function isDraw() {
     // no empty spaces and no winner
-    return board.getEmptySpacesLeft() === 0 && !isWon();
+    return board.getEmptySpaces().length === 0 && !isWon();
   }
 
   function gameOver (){
@@ -61,7 +62,7 @@ var GameState = function(config) {
   }
 
   function finishThem(){
-    return board.getEmptySpacesLeft() === 0 ?
+    return board.getEmptySpaces() === 1 ?
         board.removeEmptySpace() :
         undefined;
   }
@@ -69,105 +70,105 @@ var GameState = function(config) {
   /** Calculate Win/Loss **/
   /***
     Fastest path is taking too long to build
-  function isAnImpossibleMove(lineName){
-    var found = false;
-    impossibleMoves.forEach(function(val, idx, arr){
-      if(_.isEqual(lineName, val)){
-        found = true;
+    function isAnImpossibleMove(lineName){
+      var found = false;
+      impossibleMoves.forEach(function(val, idx, arr){
+        if(_.isEqual(lineName, val)){
+          found = true;
+          return;
+        }
+      });
+
+      return found;
+    }
+
+    function winningRow(){
+      var i = 0;
+
+      while(i < board.width){
+        var candidate = checkPath({
+            row: i,
+            col: 0
+          },
+          ROW_PREFIX + i
+        );
+
+        if(candidate){
+          return candidate;
+        }
+
+        i++;
+      }
+    }
+
+
+
+    function winningColumn(){
+      var i = 0;
+
+      while(i < board.width){
+        var candidate = checkPath({
+          row: 0,
+          col: i
+        }, COLUMN_PREFIX + i);
+
+        if(candidate){
+          return candidate;
+        }
+      }
+    }
+
+    function winningDiagonal(){
+      return checkLine(
+          { row: 0, col: 0 },
+          DIAGONAL_ID
+        );
+    }
+
+    function winningReverseDiagonal(){
+      return checkLine(
+          { row: 0, col: board.width },
+          REVERSE_DIAGONAL_ID
+        );
+    }
+
+    function checkPath(space, lineName){
+      if(isAnImpossibleMove(lineName)){
         return;
       }
-    });
 
-    return found;
-  }
+      // check for whos in a spot
+      var candidate = board.whosThere(space);
 
-  function winningRow(){
-    var i = 0;
+      if(!candidate) return;
 
-    while(i < board.width){
-      var candidate = checkPath({
-          row: i,
-          col: 0
-        },
-        ROW_PREFIX + i
-      );
+      var i = 1, j = 0, line = [space];
 
-      if(candidate){
-        return candidate;
-      }
+      for(; i < board.maxIndex; i++){
+        for(; j < board.maxIndex; j++){
+          var testSpace = board.whosThere({
+            row: i,
+            col: j
+          });
 
-      i++;
-    }
-  }
-
-
-
-  function winningColumn(){
-    var i = 0;
-
-    while(i < board.width){
-      var candidate = checkPath({
-        row: 0,
-        col: i
-      }, COLUMN_PREFIX + i);
-
-      if(candidate){
-        return candidate;
-      }
-    }
-  }
-
-  function winningDiagonal(){
-    return checkLine(
-        { row: 0, col: 0 },
-        DIAGONAL_ID
-      );
-  }
-
-  function winningReverseDiagonal(){
-    return checkLine(
-        { row: 0, col: board.width },
-        REVERSE_DIAGONAL_ID
-      );
-  }
-
-  function checkPath(space, lineName){
-    if(isAnImpossibleMove(lineName)){
-      return;
-    }
-
-    // check for whos in a spot
-    var candidate = board.whosThere(space);
-
-    if(!candidate) return;
-
-    var i = 1, j = 0, line = [space];
-
-    for(; i < board.maxIndex; i++){
-      for(; j < board.maxIndex; j++){
-        var testSpace = board.whosThere({
-          row: i,
-          col: j
-        });
-
-        if(testSpace && !_.isEqual(testSpace, candidate)){
-          impossibleMoves.push(lineName);
+          if(testSpace && !_.isEqual(testSpace, candidate)){
+            impossibleMoves.push(lineName);
+          }
+          line.push({
+            row: i,
+            col: j
+          });
         }
-        line.push({
-          row: i,
-          col: j
-        });
       }
+
+      // check for winner
+
+      if(gatherLine){
+        winningLine = line;
+      }
+
+      return candidate; // winner
     }
-
-    // check for winner
-
-    if(gatherLine){
-      winningLine = line;
-    }
-
-    return candidate; // winner
-  }
 
   ***/
 

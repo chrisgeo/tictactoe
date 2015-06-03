@@ -1,21 +1,36 @@
 var PerfectComputerPlayer = function(config){
   var START_DEPTH = 0,
-    BoardSpace,
+    defaultScore = 10,
     baseScore = 10,
     playerPiece,
     currentMove;
 
-  BoardSpace = function(score, playerMove) {
-    this.score = score;
-    this.playerMove = playerMove;
-  };
-
-  function findMax(array, property){
+  function findMaxWithProperty(array, property){
     var maxObj = _.max(array, function(obj){
       return obj[property];
     });
 
     return array[array.indexOf(maxObj)];
+  }
+
+  function arrayMin(arr) {
+    var len = arr.length, min = Infinity;
+    while (len--) {
+      if (arr[len] < min) {
+        min = arr[len];
+      }
+    }
+    return min;
+  }
+
+  function arrayMax(arr) {
+    var len = arr.length, max = -Infinity;
+    while (len--) {
+      if (arr[len] > max) {
+        max = arr[len];
+      }
+    }
+    return max;
   }
 
   function takeTurn(state){
@@ -42,14 +57,42 @@ var PerfectComputerPlayer = function(config){
   }
 
   function findBestMove(gameState){
-    var baseScore = gameState.emptySpaces().length + 1,
-      bound = baseScore + 1;
-
-    minMax(gameState, START_DEPTH, -bound, bound);
+    console.log(minMax(gameState, START_DEPTH));
     return currentMove;
 
   }
 
+  function minMax(state, depth){
+    if(state.gameOver()){
+      return figureOutState(state, depth);
+    }
+    var scores = [],
+      possibleMoves = [],
+      emptySpaces = state.emptySpaces();
+
+    depth = depth + 1;
+
+    emptySpaces.forEach(function parsePiece(val, idx, arr){
+      var childBoard = state.makeMove(val);
+      var score = minMax(childBoard, depth + 1);
+      scores.push(score);
+      possibleMoves.push(val);
+    });
+
+    if(_.isEqual(state.playerPiece, state.currentPlayer())){
+      var index = _.indexOf(scores, arrayMax(scores));
+      currentMove = possibleMoves[index];
+      console.log("MAX INDEX:", currentMove, scores[index], index);
+      return scores[index];
+    }else {
+      var index = _.indexOf(scores, arrayMin(scores));
+      currentMove = possibleMoves[index];
+      console.log("MIN INDEX:", currentMove, scores[index], index);
+      return scores[index];
+    }
+  }
+
+  /**
 
   function minMax(state, depth, lowerBound, upperBound){
     if(state.gameOver()){
@@ -88,12 +131,14 @@ var PerfectComputerPlayer = function(config){
     return lowerBound;
   }
 
+  **/
+
   function figureOutState(state, depth){
-    if(state.isWon(playerPiece)){
-      return baseScore - depth;
-    }else if(state.isLost(playerPiece)){
-      return depth - baseScore;
-    }else {
+    if(state.didIWin(playerPiece)){
+      return defaultScore - depth;
+    }else if(state.didILose(playerPiece)){
+      return depth - defaultScore;
+    }else{
       return 0;
     }
   }

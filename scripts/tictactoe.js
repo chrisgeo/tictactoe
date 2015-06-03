@@ -54,7 +54,6 @@ var GameThreeSquaredBoard = function(config){
   }
 
   function writeBoard(board){
-    console.log(board);
     var j = 0, len = board.length;
 
     for(j; j < len; j++){
@@ -142,13 +141,13 @@ var GameThreeSquaredBoard = function(config){
       data.opponent
     );
 
-    //
     // make computer move
     gameState = new PerfectComputerPlayer().takeTurn(state);
 
     // update board with computerClick
     writeBoard(gameState.getBoard().gameBoard());
     // update status, win/lose?
+    stopThinking();
     if(gameState.isWon()){
       console.log('WINNER!');
     }else if(gameState.isDraw()){
@@ -171,7 +170,6 @@ var GameThreeSquaredBoard = function(config){
           //update board
           startThinking();
           updateGameBoard();
-          stopThinking();
       }
 
     });
