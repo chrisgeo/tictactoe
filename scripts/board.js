@@ -116,6 +116,9 @@ var Board = function (config){
 
     }
 
+    function getGameBoard(){
+      return gameBoard;
+    }
 
     function init (){
         maxIndex = Math.sqrt(config.spaces) - 1;
@@ -137,6 +140,7 @@ var Board = function (config){
       corners: corners,
       anyEmptySpaces: anyEmptySpaces,
       getEmptySpacesLeft: getEmptySpacesLeft,
-      getEmptySpaces: getEmptySpaces
+      getEmptySpaces: getEmptySpaces,
+      gameBoard: getGameBoard //debug
     };
 };

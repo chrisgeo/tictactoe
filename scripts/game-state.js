@@ -18,31 +18,23 @@ var GameState = function(config) {
     return board.isBlank();
   }
 
-  function makeMove(position, gameState) {
-    var newState = $.extend({}, this);
-    newState.setPlayer(opponent);
-    newState.setOpponent(player);
-    newState.impossibleMoves = impossibleMoves.slice(0);
-    newState.board = $.extend({}, board);
-    newState.board.placePlayer(player, position);
-    checkForWin(newState.board);
+  function makeMove(position) {
+    var newState = new GameState({
+      board: cloneGameBoard(board),
+      player: player,
+      opponent: opponent
+    });
+    newState.getBoard().placePlayer(player, position);
     return newState;
   }
 
-  function isAnImpossibleMove(lineName){
-    var found = false;
-    impossibleMoves.forEach(function(val, idx, arr){
-      if(_.isEqual(lineName, val)){
-        found = true;
-        return;
-      }
-    });
-
-    return found;
-  }
   /*** check for winning functions ***/
   function didIWin(piece){
     return checkForWin(piece);
+  }
+
+  function didILose(piece){
+    return !checkForWin(piece);
   }
 
   function getWinner(){
@@ -61,7 +53,7 @@ var GameState = function(config) {
 
   function isDraw() {
     // no empty spaces and no winner
-    return !board.getEmptySpacesLeft() && isWon();
+    return board.getEmptySpacesLeft() === 0 && !isWon();
   }
 
   function gameOver (){
@@ -76,7 +68,18 @@ var GameState = function(config) {
 
   /** Calculate Win/Loss **/
   /***
-    Fastest path is taking too long
+    Fastest path is taking too long to build
+  function isAnImpossibleMove(lineName){
+    var found = false;
+    impossibleMoves.forEach(function(val, idx, arr){
+      if(_.isEqual(lineName, val)){
+        found = true;
+        return;
+      }
+    });
+
+    return found;
+  }
 
   function winningRow(){
     var i = 0;
@@ -179,7 +182,6 @@ var GameState = function(config) {
           row: i, col: j
         });
         if(_.isEqual(piece, occupiedBy)){
-          console.log(piece, occupiedBy);
           count++;
         }
 
@@ -197,7 +199,6 @@ var GameState = function(config) {
     var count = 0,
       i = 0;
 
-    console.log(piece);
     for( ; i < board.width; i++){
       var j = 0;
       for(; j < board.width; j++){
@@ -300,6 +301,7 @@ var GameState = function(config) {
     blankBoard: blankBoard,
     getWinner: getWinner,
     didIWin: didIWin,
+    didILose: didILose,
     isWon: isWon,
     isDraw: isDraw,
     isLost: isLost,

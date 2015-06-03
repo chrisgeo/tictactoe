@@ -27,12 +27,49 @@ var GameThreeSquaredBoard = function(config){
     gameState;
 
 
+  function coordinateToId(coord){
+    return [
+      '#',
+      rows[coord[0]],
+      '-',
+      '',
+      cols[coord[1]]
+    ].join('');
+  }
+
   function buildGameState(board, player, opponent){
     return new GameState({
         board: board,
         player: player,
         opponent: opponent
       });
+  }
+
+  function writeBoard(board){
+    console.log(board);
+    var j = 0, len = board.length;
+
+    for(j; j < len; j++){
+      var i = 0;
+      for(; i < len; i++){
+        var el = $(coordinateToId([j, i])),
+            piece = board[j][i],
+            playerObj = null;
+
+        if(piece && piece.indexOf(human.piece) !== -1){
+          playerObj = human;
+        }else if(piece && piece.indexOf(hal.piece) !== -1){
+          playerObj = hal;
+        }
+
+        if(piece && playerObj){
+          el.data('player', piece)
+            .find('.fa')
+            .addClass(playerObj.pieceClass)
+            .addClass(playerObj.icon);
+        }
+      }
+    }
   }
 
   function readBoard() {
@@ -72,8 +109,6 @@ var GameThreeSquaredBoard = function(config){
     return board;
   }
 
-
-
   function clearBoard() {
   }
 
@@ -91,26 +126,27 @@ var GameThreeSquaredBoard = function(config){
 
     // get board data
     var data = readBoard();
+    // create board
     var board = buildBoard(data);
+    // state from board
     var state = buildGameState(
       board,
       data.player,
       data.opponent
     );
 
-    state = new PrefectComputerPlayer().takeTurn(state);
-    console.log(state, state.getBoard());
-    // create board
+    //
     // make computer move
-
+    gameState = new PerfectComputerPlayer().takeTurn(state);
     // update status, win/lose?
-    // update board with computerClick
 
+    // update board with computerClick
+    writeBoard(gameState.getBoard().gameBoard());
     // finish thinking
 
-    //
     enable();
   }
+
   function onSpaceClick(){
     boardDom.on('click', '.space', function(e){
       var tgt = $(e.currentTarget);

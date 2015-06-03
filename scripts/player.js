@@ -1,9 +1,8 @@
-var PrefectComputerPlayer = function(config){
+var PerfectComputerPlayer = function(config){
   var START_DEPTH = 0,
     BoardSpace,
     baseScore = 10,
     playerPiece,
-    gameState,
     currentMove;
 
   BoardSpace = function(score, playerMove) {
@@ -23,34 +22,34 @@ var PrefectComputerPlayer = function(config){
     if(state.gameOver()){
       return state;
     }
-
-    gameState = state;
-    playerPiece = gameState.currentPlayer();
-    gameState.makeMove(chooseMove());
+    playerPiece = state.currentPlayer();
+    var move = chooseMove(state);
+    return state.makeMove(move);
   }
 
   function getRandomPosition(corners){
     return corners[Math.floor(Math.random() * corners.length)];
   }
 
-  function chooseMove(){
+  function chooseMove(gameState){
     if(gameState.blankBoard()){
       return getRandomPosition(gameState.corners);
     }else if(gameState.finishThem()){
       return gameState.finishThem();
     }
 
-    return findBestMove();
+    return findBestMove(gameState);
   }
 
-  function findBestMove(){
-    var bound;
-    baseScore = gameState.emptySpaces().length + 1;
-    bound = baseScore + 1;
+  function findBestMove(gameState){
+    var baseScore = gameState.emptySpaces().length + 1,
+      bound = baseScore + 1;
+
     minMax(gameState, START_DEPTH, -bound, bound);
     return currentMove;
 
   }
+
 
   function minMax(state, depth, lowerBound, upperBound){
     if(state.gameOver()){
@@ -59,14 +58,12 @@ var PrefectComputerPlayer = function(config){
 
     var possibleMoves = [],
         i = 0,
-        currentMove,
         emptySpaces = state.emptySpaces();
 
     for(i = 0; i < emptySpaces.length; i++){
       var childBoard = state.makeMove(emptySpaces[i]),
         score = minMax(childBoard, depth + 1, lowerBound, upperBound),
         node = new BoardSpace(score, emptySpaces[i]);
-        console.log(lowerBound, upperBound, score);
 
         if(_.isEqual(state.currentPlayer(), playerPiece)){
           possibleMoves.push(node);
@@ -88,7 +85,6 @@ var PrefectComputerPlayer = function(config){
     }
 
     currentMove = findMax(possibleMoves, 'score').playerMove;
-    console.log('currentMove: ', currentMove);
     return lowerBound;
   }
 
