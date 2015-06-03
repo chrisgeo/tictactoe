@@ -1,13 +1,3 @@
-if(!Array.maxProp){
-  Array.maxProp = function(array, prop){
-    var values = array.map(function (el){
-      return el[prop];
-    });
-
-    return Math.max.apply(Math, values);
-  };
-}
-
 if(!Array.deleteObject){
   Array.prototype.deleteObject = function(object){
     // depend on lodash

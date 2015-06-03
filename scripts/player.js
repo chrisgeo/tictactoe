@@ -11,6 +11,13 @@ var PrefectComputerPlayer = function(config){
     this.playerMove = playerMove;
   };
 
+  function findMax(array, property){
+    var maxObj = _.max(array, function(obj){
+      return obj[property];
+    });
+
+    return array[array.indexOf(maxObj)];
+  }
 
   function takeTurn(state){
     if(state.gameOver()){
@@ -80,7 +87,7 @@ var PrefectComputerPlayer = function(config){
       return upperBound;
     }
 
-    currentMove = Array.maxProp(possibleMoves, 'score');
+    currentMove = findMax(possibleMoves, 'score').playerMove;
     console.log('currentMove: ', currentMove);
     return lowerBound;
   }
