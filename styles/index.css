@@ -87,3 +87,12 @@ a, a:hover, a:visited {
 .board-container {
   padding: 20px 0;
 }
+
+.thinking .fa {
+  line-height: 90px;
+  font-size: 50px;
+}
+
+.hidden {
+  display: none;
+}

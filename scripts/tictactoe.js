@@ -27,6 +27,14 @@ var GameThreeSquaredBoard = function(config){
     gameState;
 
 
+  function startThinking(){
+    $('.thinking').removeClass('hidden');
+  }
+
+  function stopThinking(){
+    $('.thinking').addClass('hidden');
+  }
+
   function coordinateToId(coord){
     return [
       '#',
@@ -123,7 +131,6 @@ var GameThreeSquaredBoard = function(config){
   function updateGameBoard(){
     disable();
     // think
-
     // get board data
     var data = readBoard();
     // create board
@@ -138,13 +145,17 @@ var GameThreeSquaredBoard = function(config){
     //
     // make computer move
     gameState = new PerfectComputerPlayer().takeTurn(state);
-    // update status, win/lose?
 
     // update board with computerClick
     writeBoard(gameState.getBoard().gameBoard());
-    // finish thinking
-
-    enable();
+    // update status, win/lose?
+    if(gameState.isWon()){
+      console.log('WINNER!');
+    }else if(gameState.isDraw()){
+      console.log('DRAW!');
+    }else {
+      enable();
+    }
   }
 
   function onSpaceClick(){
@@ -158,7 +169,9 @@ var GameThreeSquaredBoard = function(config){
           .addClass(human.icon);
           tgt.find('i').removeClass('hover');
           //update board
+          startThinking();
           updateGameBoard();
+          stopThinking();
       }
 
     });
@@ -240,6 +253,7 @@ $(document).ready(function(){
     'click',
     function(e){
       var tgt = $(e.currentTarget);
+      $('.footer .subheader').hide();
 
       if(!tgt.hasClass('disabled')){
         var hal, human;
