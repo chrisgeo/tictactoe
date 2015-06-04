@@ -5,10 +5,9 @@ var stylish = require('jshint-stylish');
 
 gulp.task('lint', function () {
   'use strict';
-  return gulp.src('./lib/**/*.js')
+  return gulp.src('./scripts/**/*.js')
     .pipe(jshint())
-    .pipe(jshint.reporter(stylish))
-    .pipe(jshint.reporter('fail'));
+    .pipe(jshint.reporter(stylish));
 });
 
 gulp.task('test', ['lint'], function () {

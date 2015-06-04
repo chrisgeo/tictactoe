@@ -169,7 +169,11 @@ var GameThreeSquaredBoard = function(config){
           tgt.find('i').removeClass('hover');
           //update board
           startThinking();
-          updateGameBoard();
+          /** Gives us time to display thinking **/
+          setTimeout(
+            updateGameBoard,
+            100
+          );
       }
 
     });

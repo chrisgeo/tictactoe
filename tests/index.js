@@ -133,6 +133,7 @@ describe('GameState', function () {
 
     assert.equal(true, state.blankBoard());
 
+    // no moves yet
     assert.equal(false, state.didIWin('x'));
     assert.equal(false, state.didIWin('o'));
     assert.equal(false, state.isWon());
@@ -161,6 +162,13 @@ describe('GameState', function () {
     state = state.makeMove({row: 1, col: 1}); // o moves
     state = state.makeMove({row: 2, col: 1}); // x moves
     state = state.makeMove({row: 1, col: 2}); // o moves
+    assert.equal(
+      'o',
+      state.getBoard().whosThere({
+        row: 1,
+        col: 2
+      })
+    );
 
     assert.equal(
       3,
@@ -194,11 +202,10 @@ describe('GameState', function () {
     state = state.makeMove({row: 1, col: 0}); // x moves to middle left
     state = state.makeMove({row: 1, col: 2}); // o moves to middle right
     state = state.makeMove({row: 2, col: 0}); // x moves bottom left
-    var boardStr = state.getBoard().toString();
-    assert.equal(false, state.didIWin('x'), "X shouldn't win, didIWin ::\n" + boardStr);
-    assert.equal(false, state.didIWin('o'), "O shouldn't win, didIWin ::\n" + boardStr);
-    assert.equal(false, state.didILose('o'), "O should not lose :: \n" + boardStr);
-    assert.equal(false, state.didILose('x'), "X should not lose, didILose :: \n" + boardStr);
+    assert.equal(false, state.didIWin('x'), "X shouldn't win, didIWin ::\n");
+    assert.equal(false, state.didIWin('o'), "O shouldn't win, didIWin ::\n" );
+    assert.equal(false, state.didILose('o'), "O should not lose :: \n" );
+    assert.equal(false, state.didILose('x'), "X should not lose, didILose :: \n" );
     assert.equal(false, state.isWon(), 'Game should not be won');
     assert.equal(false, state.isLost(), 'Game should not be lost');
     assert.equal(true, state.isDraw(), 'Game should be a draw');
@@ -212,11 +219,8 @@ describe('PerfectComputerPlayer', function () {
     demand(PerfectComputerPlayer).to.exist();
   });
 
-  if('minMax :: should pick middle', function(){
 
-  });
-
-  it('chooseMove::getRandomPosition', function (){
+  it('takeTurn::getRandomPosition', function (done){
     var b = new Board({spaces: 9});
     var state = new GameState({
       board: b,
@@ -226,11 +230,13 @@ describe('PerfectComputerPlayer', function () {
 
     // assuming the computer is player
     var p = new PerfectComputerPlayer();
-    var move = p.chooseMove(state); // should return random corner.
-    assert.equal(true, !!move); // assert exists - binary type cohersion.
+    state = p.takeTurn(state); // should return random corner.
+    assert.equal(true, !!state); // assert exists - binary type cohersion.
+    done();
   });
 
-  it('chooseMove::get Middle Spot', function(){
+  it('takeTurn::get Middle Spot', function(done){
+      this.timeout(15000);
       var b = new Board({spaces: 9});
       var state = new GameState({
         board: b,
@@ -240,17 +246,16 @@ describe('PerfectComputerPlayer', function () {
 
       // assuming the computer is player
       var p = new PerfectComputerPlayer();
-      state = state.makeMove({row: 0, col: 1}); // upper left corner
-      console.log(state.getBoard().toString());
+      state = state.makeMove({row: 0, col: 0}); // upper left corner
 
-      var move = p.chooseMove(state);
-      state = state.makeMove(move);
-      console.log(state.getBoard().toString());
-
+      var state = p.takeTurn(state);
       // should always choose move in the middle
-      assert.equal({row: 1, col: 1}, move);
-      // if human makes move in upper left
-      // computer should make move to center
+      assert.equal(
+        'o',
+        state.getBoard().whosThere({row: 1, col: 1})
+      );
+      // key to making a draw or victory
+      done();
   });
 });
 
