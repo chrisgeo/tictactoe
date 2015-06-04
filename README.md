@@ -11,6 +11,15 @@ $ gulp tests
 
 ```
 
+## CURRENT ISSUES
+
+[ ] UI Could be better
+[ ] UI Javaascript should be more event based, instead of functional
+[ ] First time look up is slow for computer
+[ ] "Heavy" (lodash and jquery) on the use of third party libraries for convenience
+[ ] A few more unit test would be ideal
+[ ] Promises for "backend" game logic
+
 ## License
 
 MIT © [Chris George]()
