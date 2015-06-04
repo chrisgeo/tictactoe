@@ -292,16 +292,7 @@ var GameThreeSquaredBoard = function(config){
 };
 
 $(document).ready(function(){
-  var x = new Player({
-    piece: 'x',
-    icon: 'fa-times',
-    pieceClass: 'computer'
-  }),
-  o = new Player({
-    piece: 'o',
-    icon: 'fa-circle-o',
-    pieceClass: 'human'
-  }), game;
+  var game;
 
   $('.start-button').on(
     'click',
@@ -313,14 +304,30 @@ $(document).ready(function(){
       if(!tgt.hasClass('disabled')){
         var hal, human;
         if(tgt.hasClass('you-start')){
-          x.pieceClass = 'human';
-          o.pieceClass = 'computer';
-          hal = o;
-          human = x;
+          var human = new Player({
+              piece: 'x',
+              icon: 'fa-times',
+              pieceClass: 'human'
+            }),
+            hal = new Player({
+              piece: 'o',
+              icon: 'fa-circle-o',
+              pieceClass: 'computer'
+            });
+
         }else {
+          var human = new Player({
+              piece: 'o',
+              icon: 'fa-circle-o',
+              pieceClass: 'human'
+            }),
+            hal = new Player({
+              piece: 'x',
+              icon: 'fa-times',
+              pieceClass: 'computer'
+            });
+
           halStarts = true;
-          hal = x;
-          human = o;
         }
 
         game = new GameThreeSquaredBoard({
