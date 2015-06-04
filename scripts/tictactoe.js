@@ -117,6 +117,11 @@ var GameThreeSquaredBoard = function(config){
   }
 
   function clearBoard() {
+    disable();
+    boardDom.find(TBODY).empty();
+    $('.overlay').addClass('hidden');
+    writeDom();
+    $('.start-button').removeClass('disabled');
   }
 
   function enable(){
@@ -149,12 +154,20 @@ var GameThreeSquaredBoard = function(config){
     // update status, win/lose?
     stopThinking();
     if(gameState.isWon()){
-      console.log('WINNER!');
+      $('body').trigger('WINNER', [gameState.currentOpponent()]);
     }else if(gameState.isDraw()){
-      console.log('DRAW!');
+      $('body').trigger('DRAW');
     }else {
       enable();
     }
+  }
+
+  function halMove(){
+    startThinking();
+    setTimeout(
+      updateGameBoard,
+      100
+    );
   }
 
   function onSpaceClick(){
@@ -178,6 +191,8 @@ var GameThreeSquaredBoard = function(config){
 
     });
   }
+
+
   function onHoverShowMove(){
     boardDom.on({
       mouseenter: function(e){
@@ -202,6 +217,21 @@ var GameThreeSquaredBoard = function(config){
     }, '.space');
   }
 
+  function onWin(e, player){
+    var text = 'YOU WON!';
+
+    if(hal.piece.indexOf(player) === 0){
+      text = 'HAL WON!';
+    }
+
+    $('.overlay').text(text).removeClass('hidden');
+
+  }
+
+  function onDraw(e){
+    $('.overlay').text('DRAW!').removeClass('hidden');
+  }
+
   function writeDom(){
     var tbody = boardDom.find(TBODY);
     tbody.empty();
@@ -222,14 +252,36 @@ var GameThreeSquaredBoard = function(config){
     });
   }
 
+  function onPlayAgain(e){
+    var tgt = $(e.currentTarget);
+
+    // reset board
+    tgt.addClass('hidden');
+    clearBoard();
+    $('.who-starts').show();
+  }
+
   function registerEvents() {
     onHoverShowMove();
     onSpaceClick();
+    $('body').on('click', '.play-again', onPlayAgain);
+    $('body').on('WINNER', onWin);
+    $('body').on('DRAW', onDraw);
+    $('body').on('DRAW WINNER', function(e){
+      $('.play-again').removeClass('hidden');
+    });
   }
 
-  function init(){
+  function init(config){
     registerEvents();
-    writeDom();
+    clearBoard();
+    if(config.halStarts){
+      // totally should be an event
+      disable();
+      halMove();
+    }else{
+      enable();
+    }
   }
 
   return {
@@ -254,17 +306,19 @@ $(document).ready(function(){
   $('.start-button').on(
     'click',
     function(e){
-      var tgt = $(e.currentTarget);
-      $('.footer .subheader').hide();
+      var tgt = $(e.currentTarget),
+        halStarts = false;
+      $('.footer .who-starts').hide();
 
       if(!tgt.hasClass('disabled')){
         var hal, human;
-        if(tgt.hasClass('.you-start')){
+        if(tgt.hasClass('you-start')){
           x.pieceClass = 'human';
           o.pieceClass = 'computer';
           hal = o;
           human = x;
-        }else{
+        }else {
+          halStarts = true;
           hal = x;
           human = o;
         }
@@ -274,7 +328,11 @@ $(document).ready(function(){
           human: human,
           selector: '#board'
         });
-        game.init();
+
+        game.init({
+          halStarts: halStarts
+        });
+
         $('.start-button').addClass('disabled');
       }
   });

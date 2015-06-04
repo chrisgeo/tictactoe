@@ -96,3 +96,14 @@ a, a:hover, a:visited {
 .hidden {
   display: none;
 }
+
+.play-again {
+  cursor: pointer;
+}
+
+.jumbotron {
+  text-align: center;
+  color: #7B7272;
+  font-weight: bold;
+  font-size: 40px;
+}
