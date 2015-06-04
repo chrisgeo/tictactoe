@@ -5,31 +5,6 @@ if(!_){
   Board = require('./board.js');
 }
 
-
-function cloneGameBoard(board){
-  /***
-    Since Object.clone and .create
-    Do not lose refenence, so create an
-    entirely new object
-  ***/
-  var newBoard = new Board({
-    spaces: board.width * board.width
-  }),
-  oldGameBoard = board.gameBoard();
-
-  for(var i=0; i < board.width; i++){
-    for(var j = 0; j < board.width; j++){
-      if(oldGameBoard[i][j] !== 0){
-        newBoard.placePlayer(
-          oldGameBoard[i][j],
-          { row: i, col: j }
-        );
-      }
-    }
-  }
-  return newBoard;
-}
-
 var GameState = function(config) {
   var board = config.board,
     opponent = config.opponent,
@@ -44,7 +19,7 @@ var GameState = function(config) {
     if(board.isEmptySpace(position)){
       // Having to clone the board
       // causes slowness
-      var newBoard = cloneGameBoard(board);
+      var newBoard = board.clone();
       newBoard.placePlayer(player, position);
       return new GameState({
         board: newBoard,

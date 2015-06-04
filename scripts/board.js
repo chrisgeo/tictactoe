@@ -19,6 +19,23 @@ var Board = function (config){
        throw "Not a square number! Spaces = " + config.spaces;
     }
 
+    function __setEmpties(empties){
+      emptySpaces = empties;
+    }
+
+    function __setBoard(board){
+      gameBoard = board;
+    }
+
+    function clone(){
+      var newObj = new Board({spaces: config.spaces});
+      newObj.__setBoard(gameBoard.map(function(arr){
+        return arr.slice();
+      }));
+      newObj.__setEmpties(emptySpaces.slice());
+      return newObj;
+    }
+
     function anyEmptySpaces() {
       return emptySpacesLeft !== 0;
     }
@@ -47,7 +64,7 @@ var Board = function (config){
 
 
     function getEmptySpacesLeft(){
-      return emptySpacesLeft;
+      return emptySpaces.length;
     }
 
     function placePlayer (player, position) {
@@ -138,6 +155,7 @@ var Board = function (config){
     init();
 
     return {
+      clone: clone,
       toString: toString,
       width: Math.sqrt(config.spaces),
       isBlank: isBlank,
@@ -150,7 +168,9 @@ var Board = function (config){
       anyEmptySpaces: anyEmptySpaces,
       getEmptySpacesLeft: getEmptySpacesLeft,
       getEmptySpaces: getEmptySpaces,
-      gameBoard: getGameBoard
+      gameBoard: getGameBoard,
+      __setBoard: __setBoard,
+      __setEmpties: __setEmpties
     };
 };
 
