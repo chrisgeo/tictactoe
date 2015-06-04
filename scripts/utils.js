@@ -1,3 +1,23 @@
+var _ = _ || undefined;
+if(!_){
+  // hacks for node tests
+  _ = require('./lodash.min.js');
+}
+
+_.mixin({
+  indexOfObj: function(arr, obj){
+    var inIndex = -1;
+    arr.some(function(val, idx, arr){
+      if(_.isEqual(val, obj)){
+        inIndex = idx;
+        return inIndex;
+      }
+    });
+
+    return inIndex;
+  }
+});
+
 if(!Array.prototype.deleteObject){
   Array.prototype.deleteObject = function(object){
     // depend on lodash
@@ -8,28 +28,3 @@ if(!Array.prototype.deleteObject){
     });
   };
 }
-
-function cloneGameBoard(board){
-  /***
-    Since Object.clone and .create
-    Do not lose refenence, so create an
-    entirely new object
-  ***/
-  var newBoard = new Board({
-    spaces: board.width * board.width
-  }),
-  oldGameBoard = board.gameBoard();
-
-  for(var i=0; i < board.width; i++){
-    for(var j = 0; j < board.width; j++){
-      if(oldGameBoard[i][j] !== 0){
-        newBoard.placePlayer(
-          oldGameBoard[i][j],
-          { row: i, col: j }
-        );
-      }
-    }
-  }
-  return newBoard;
-}
-

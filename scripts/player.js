@@ -1,17 +1,21 @@
+var _ = _ || undefined;
+if(!_){
+  // hacks for node tests
+  _ = require('./lodash.min.js');
+}
+
 var PerfectComputerPlayer = function(config){
   var START_DEPTH = 0,
     defaultScore = 10,
-    baseScore = 10,
     playerPiece,
-    currentMove;
-
-  function findMaxWithProperty(array, property){
-    var maxObj = _.max(array, function(obj){
-      return obj[property];
-    });
-
-    return array[array.indexOf(maxObj)];
-  }
+    currentMove,
+    BoardNode = function(score, position, piece){
+      return {
+        score: score,
+        position: position,
+        piece: piece
+      };
+    };
 
   function arrayMin(arr) {
     var len = arr.length, min = Infinity;
@@ -37,7 +41,7 @@ var PerfectComputerPlayer = function(config){
     if(state.gameOver()){
       return state;
     }
-    playerPiece = state.currentPlayer();
+
     var move = chooseMove(state);
     return state.makeMove(move);
   }
@@ -47,17 +51,19 @@ var PerfectComputerPlayer = function(config){
   }
 
   function chooseMove(gameState){
+    playerPiece = gameState.currentPlayer();
+
     if(gameState.blankBoard()){
       return getRandomPosition(gameState.corners);
-    }else if(gameState.finishThem()){
-      return gameState.finishThem();
+    }else if(gameState.emptySpaces().length === 1){
+      return gameState.finishTheFight();
     }
 
     return findBestMove(gameState);
   }
 
   function findBestMove(gameState){
-    console.log(minMax(gameState, START_DEPTH));
+    minMax(gameState, 0);
     return currentMove;
 
   }
@@ -79,74 +85,32 @@ var PerfectComputerPlayer = function(config){
       possibleMoves.push(val);
     });
 
-    if(_.isEqual(state.playerPiece, state.currentPlayer())){
+    if(playerPiece.indexOf(state.currentPlayer()) !== -1){
       var index = _.indexOf(scores, arrayMax(scores));
       currentMove = possibleMoves[index];
-      console.log("MAX INDEX:", currentMove, scores[index], index);
       return scores[index];
     }else {
       var index = _.indexOf(scores, arrayMin(scores));
       currentMove = possibleMoves[index];
-      console.log("MIN INDEX:", currentMove, scores[index], index);
       return scores[index];
     }
   }
-
-  /**
-
-  function minMax(state, depth, lowerBound, upperBound){
-    if(state.gameOver()){
-      return figureOutState(state, depth);
-    }
-
-    var possibleMoves = [],
-        i = 0,
-        emptySpaces = state.emptySpaces();
-
-    for(i = 0; i < emptySpaces.length; i++){
-      var childBoard = state.makeMove(emptySpaces[i]),
-        score = minMax(childBoard, depth + 1, lowerBound, upperBound),
-        node = new BoardSpace(score, emptySpaces[i]);
-
-        if(_.isEqual(state.currentPlayer(), playerPiece)){
-          possibleMoves.push(node);
-
-          if(node.score > lowerBound){
-            lowerBound = node.score;
-          }
-        }else if(node.score < upperBound){
-          upperBound = node.score;
-        }
-
-        if(upperBound < lowerBound){
-          break;
-        }
-    }
-
-    if(!_.isEqual(state.currentPlayer(), playerPiece)){
-      return upperBound;
-    }
-
-    currentMove = findMax(possibleMoves, 'score').playerMove;
-    return lowerBound;
-  }
-
-  **/
 
   function figureOutState(state, depth){
     if(state.didIWin(playerPiece)){
       return defaultScore - depth;
     }else if(state.didILose(playerPiece)){
       return depth - defaultScore;
-    }else{
-      return 0;
     }
+
+    return 0;
   }
 
   return {
     takeTurn: takeTurn,
     chooseMove: chooseMove,
-    findBestMove: findBestMove,
-    figureOutState: figureOutState
+    minMax: minMax
   };
 };
+
+if(module) module.exports = PerfectComputerPlayer;

@@ -1,3 +1,9 @@
+var _ = _ || undefined;
+if(!_){
+  // hacks for node tests
+  _ = require('./lodash.min.js');
+}
+
 var Board = function (config){
     var defaults = {
         spaces: 9
@@ -26,15 +32,9 @@ var Board = function (config){
     }
 
     function isEmptySpace (position) {
-      var inArray = false;
+      var piece = gameBoard[position.row][position.col];
 
-      // could use some
-      emptySpaces.some(function(val, idx){
-        inArray = _.isEqual(val, position);
-        return inArray;
-      });
-
-      return inArray;
+      return piece === 0 ? true : false;
     }
 
     function isBlank(){
@@ -42,9 +42,7 @@ var Board = function (config){
     }
 
     function whosThere (position) {
-        if(!isEmptySpace(position)) {
-            return gameBoard[position.row][position.col];
-        }
+        return gameBoard[position.row][position.col];
     }
 
 
@@ -127,9 +125,20 @@ var Board = function (config){
         createEmptySpaces();
     }
 
+    function toString(){
+      var i = 0, board = '';
+
+      for(; i < gameBoard.length; i++){
+        board = [board, gameBoard[i].toString(), "\n"].join("");
+      }
+
+      return board;
+    }
+
     init();
 
     return {
+      toString: toString,
       width: Math.sqrt(config.spaces),
       isBlank: isBlank,
       maxIndex: maxIndex,
@@ -141,6 +150,11 @@ var Board = function (config){
       anyEmptySpaces: anyEmptySpaces,
       getEmptySpacesLeft: getEmptySpacesLeft,
       getEmptySpaces: getEmptySpaces,
-      gameBoard: getGameBoard //debug
+      gameBoard: getGameBoard
     };
 };
+
+var module = module || undefined;
+if(module){
+ module.exports = Board;
+}

@@ -1,33 +1,15 @@
-#  [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+#  [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 
 > TicTacToe 
 
 
-## Install
+## Develop and Run Tests
 
 ```sh
-$ npm install --save tictactoe
+$ npm install 
+$ gulp tests
+
 ```
-
-
-## Usage
-
-```js
-var tictactoe = require('tictactoe');
-
-tictactoe('Rainbow');
-```
-
-```sh
-$ npm install --global tictactoe
-$ tictactoe --help
-```
-
-```sh
-# creates a browser.js
-$ npm run browser
-```
-
 
 ## License
 

@@ -1,55 +1,78 @@
+var _ = _ || undefined;
+if(!_){
+  // hacks for node tests
+  _ = require('./lodash.min.js');
+  Board = require('./board.js');
+}
+
+
+function cloneGameBoard(board){
+  /***
+    Since Object.clone and .create
+    Do not lose refenence, so create an
+    entirely new object
+  ***/
+  var newBoard = new Board({
+    spaces: board.width * board.width
+  }),
+  oldGameBoard = board.gameBoard();
+
+  for(var i=0; i < board.width; i++){
+    for(var j = 0; j < board.width; j++){
+      if(oldGameBoard[i][j] !== 0){
+        newBoard.placePlayer(
+          oldGameBoard[i][j],
+          { row: i, col: j }
+        );
+      }
+    }
+  }
+  return newBoard;
+}
+
 var GameState = function(config) {
-  var self = this,
-    board = config.board,
-    DIAGONAL_ID = 'd,'
-    REVERSE_DIAGONAL_ID = 'rd',
-    COLUMN_PREFIX = 'c',
-    ROW_PREFIX = 'r',
-    minimumMovesForWin = (config.board.boardSize/2 - 1),
+  var board = config.board,
     opponent = config.opponent,
     player = config.player,
-    winner = null,
-    draw = null,
-    winningLine = null,
-    gatherLine = true,
-    impossibleMoves = [];
+    winner = null;
 
   function blankBoard(){
     return board.isBlank();
   }
 
   function makeMove(position) {
-    // this is causing slowness
-    var newState = new GameState({
-      board: cloneGameBoard(board),
-      player: player,
-      opponent: opponent
-    });
-    newState.getBoard().placePlayer(player, position);
-    return newState;
+    if(board.isEmptySpace(position)){
+      // Having to clone the board
+      // causes slowness
+      var newBoard = cloneGameBoard(board);
+      newBoard.placePlayer(player, position);
+      return new GameState({
+        board: newBoard,
+        player: opponent,
+        opponent: player
+      });
+
+    }else{
+      return this;
+    }
   }
 
   /*** check for winning functions ***/
   function didIWin(piece){
-    return checkForWin(piece) !== undefined;
+    return checkForWin(piece);
   }
 
   function didILose(piece){
-    return !checkForWin(piece);
+    return !isDraw() && !checkForWin(piece);
   }
 
-  function getWinner(){
+
+  function isWon() {
     return checkForWin(player) || checkForWin(opponent);
   }
 
-  function isWon() {
-    return (
-        checkForWin(player) || checkForWin(opponent)
-    ) ? true : false;
-  }
-
-  function isLost(piece){
-    return !isDraw() && isWon();
+  function isLost(){
+    return isWon();
   }
 
   function isDraw() {
@@ -61,10 +84,8 @@ var GameState = function(config) {
     return isWon() || isDraw();
   }
 
-  function finishThem(){
-    return board.getEmptySpaces() === 1 ?
-        board.removeEmptySpace() :
-        undefined;
+  function finishTheFight(){
+    return board.getEmptySpaces().pop();
   }
 
   /** Calculate Win/Loss **/
@@ -182,18 +203,21 @@ var GameState = function(config) {
         var occupiedBy = board.whosThere({
           row: i, col: j
         });
-        if(_.isEqual(piece, occupiedBy)){
+
+        if(occupiedBy && occupiedBy.indexOf(piece) !== -1){
           count++;
         }
 
         if(count === board.width){
-          return piece;
+          winner = piece;
+          return true;
         }
       }
       // finished row, reset count
       count = 0;
     }
 
+    return false;
   }
 
   function winningColumn(piece){
@@ -207,17 +231,20 @@ var GameState = function(config) {
           row: j, col: i
         });
 
-        if(_.isEqual(piece, occupiedBy)){
+        if(occupiedBy && occupiedBy.indexOf(piece) !== -1){
           count++;
         }
 
         if(count === board.width){
-          return piece;
+          winner = piece;
+          return true;
         }
       }
       // finished column reset count
       count = 0;
     }
+
+    return false;
   }
 
   function winningDiagonal(piece){
@@ -230,14 +257,17 @@ var GameState = function(config) {
         col: i
       });
 
-      if(_.isEqual(piece, occupiedBy)){
+      if(occupiedBy && occupiedBy.indexOf(piece) !== -1){
         count++;
       }
 
       if(count === board.width){
-        return piece;
+        winner = piece;
+        return true;
       }
     }
+
+    return false;
   }
 
   function winningRevDiagonal(piece){
@@ -250,28 +280,29 @@ var GameState = function(config) {
           col: board.width - i - 1
         });
 
-        if(_.isEqual(piece, occupiedBy)){
+        if(occupiedBy && occupiedBy.indexOf(piece) !== -1){
           count ++;
         }
 
         if(count === board.width){
-          return piece;
+          winner = piece;
+          return true;
         }
       }
+
+      return false;
   }
 
   function checkForWin(piece){
-    winner =
-      winningRow(piece) ||
+
+    return winningRow(piece) ||
       winningColumn(piece) ||
       winningDiagonal(piece) ||
       winningRevDiagonal(piece);
-
-    return winner;
   }
 
   function availableMoves(){
-    return board.emptySpacesLeft;
+    return board.getEmptySpacesLeft();
   }
 
   function currentPlayer(){
@@ -300,7 +331,6 @@ var GameState = function(config) {
 
   return {
     blankBoard: blankBoard,
-    getWinner: getWinner,
     didIWin: didIWin,
     didILose: didILose,
     isWon: isWon,
@@ -313,9 +343,11 @@ var GameState = function(config) {
     corners: board.corners,
     emptySpaces: emptySpaces,
     gameOver: gameOver,
-    finishThem: finishThem,
+    finishTheFight: finishTheFight,
     setPlayer: setPlayer,
     setOpponent: setOpponent,
     getBoard: getBoard
   };
 };
+
+if(module) module.exports = GameState;
