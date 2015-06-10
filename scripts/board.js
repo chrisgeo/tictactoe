@@ -11,7 +11,6 @@ var Board = function (config){
     gameBoard,
     emptySpaces = [],
     emptySpacesLeft = config.spaces,
-    corners,
     maxIndex;
 
     // check config is 'squareable'
@@ -138,7 +137,6 @@ var Board = function (config){
     function init (){
         maxIndex = Math.sqrt(config.spaces) - 1;
         gameBoard = createBoard(config.spaces);
-        corners = getCorners();
         createEmptySpaces();
     }
 
@@ -169,7 +167,7 @@ var Board = function (config){
       isEmptySpace: isEmptySpace,
       whosThere: whosThere,
       placePlayer: placePlayer,
-      corners: corners,
+      corners: getCorners(),
       anyEmptySpaces: anyEmptySpaces,
       getEmptySpacesLeft: getEmptySpacesLeft,
       getEmptySpaces: getEmptySpaces,

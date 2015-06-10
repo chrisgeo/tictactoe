@@ -74,8 +74,7 @@ var PerfectComputerPlayer = function(config){
     if(state.gameOver()){
       return figureOutState(state, depth);
     }
-    var scores = [],
-      possibleMoves = [],
+    var possibleMoves = [],
       emptySpaces = state.emptySpaces(),
       i = 0,
       len = emptySpaces.length;
@@ -90,8 +89,6 @@ var PerfectComputerPlayer = function(config){
           score: score,
           move: move
         });
-
-        scores.push(score);
 
         if(score > lower){
           lower = score;
