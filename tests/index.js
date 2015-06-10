@@ -93,12 +93,12 @@ describe('GameState', function () {
 
     assert.equal(true, state.blankBoard());
 
-    assert.equal(false, state.didIWin('x'));
-    assert.equal(false, state.didIWin('o'));
-    assert.equal(false, state.isWon());
-    assert.equal(false, state.isDraw());
+    assert.equal(false, state.didIWin('x'), "X Shouldn't win");
+    assert.equal(false, state.didIWin('o'), "O Shouldn't win yet");
+    assert.equal(false, state.isWon(), "Game should not be won");
+    assert.equal(false, state.isDraw(), "Game should be a draw");
 
-    assert.equal(9, state.availableMoves());
+    assert.equal(9, state.availableMoves(), "availableMoves should be 9");
     state = state.makeMove({row: 0, col: 0}); // x moves
     assert.equal(
       8,
@@ -119,10 +119,10 @@ describe('GameState', function () {
       4,
       state.availableMoves()
     );
-    assert.equal(true, state.didIWin('x'));
-    assert.equal(false, state.didIWin('o'));
-    assert.equal(false, state.isDraw());
-    assert.equal(true, state.gameOver());
+    assert.equal(true, state.didIWin('x'), "X Should be the winner");
+    assert.equal(false, state.didIWin('o'), "O Should not win");
+    assert.equal(false, state.isDraw(), "Game should not be a draw");
+    assert.equal(true, state.gameOver(), "Game should be over");
   });
 
   it('Game X Loses/O Wins', function () {
@@ -139,7 +139,6 @@ describe('GameState', function () {
     assert.equal(false, state.didIWin('x'));
     assert.equal(false, state.didIWin('o'));
     assert.equal(false, state.isWon());
-    assert.equal(false, state.isLost());
     assert.equal(false, state.isDraw());
 
     assert.equal(9, state.availableMoves());

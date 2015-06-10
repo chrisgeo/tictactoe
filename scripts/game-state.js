@@ -76,21 +76,21 @@ var GameState = function(config) {
 
   /*** check for winning functions ***/
   function didIWin(piece){
-    return winner ? winner.indexOf(piece) >= 0 : false;
+    return winner === piece;
   }
 
   function didILose(piece){
-    return winner && winner.indexOf(piece) >= 0;
+    return winner && winner !== piece;
   }
 
 
   function isWon() {
-    return !winner;
+    return !!winner;
   }
 
   function isDraw(piece) {
     // no empty spaces and no winner
-    return board.getEmptySpaces().length === 0 && !isWon();
+    return board.getEmptySpaces().length === 0 && !winner;
   }
 
   function gameOver (){
