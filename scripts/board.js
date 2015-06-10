@@ -152,6 +152,11 @@ var Board = function (config){
       return board;
     }
 
+    function occupiedSpaces() {
+      return config.spaces - emptySpacesLeft;
+    }
+
+
     init();
 
     return {
@@ -169,6 +174,7 @@ var Board = function (config){
       getEmptySpacesLeft: getEmptySpacesLeft,
       getEmptySpaces: getEmptySpaces,
       gameBoard: getGameBoard,
+      occupiedSpaces: occupiedSpaces,
       __setBoard: __setBoard,
       __setEmpties: __setEmpties
     };

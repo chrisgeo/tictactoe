@@ -28,6 +28,8 @@ describe('Board', function () {
       col: 0
     }));
 
+    assert.equal(b.occupiedSpaces(), 1);
+
     b.placePlayer('x', {
       row: 1,
       col: 0
@@ -38,6 +40,7 @@ describe('Board', function () {
       col: 0
     }));
 
+    assert.equal(b.occupiedSpaces(), 2);
     assert.equal('o', b.whosThere({
       row: 0,
       col: 0
@@ -54,7 +57,7 @@ describe('Board', function () {
     }));
 
     assert.equal(true, b.isEmptySpace({row: 1, col: 1}));
-
+    assert.equal(b.occupiedSpaces(), 2);
     assert.notEqual(
       -1,
       _.indexOfObj(
