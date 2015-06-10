@@ -9,8 +9,46 @@ var GameState = function(config) {
   var board = config.board,
     opponent = config.opponent,
     player = config.player,
+    DIAGONAL_ID = 'd',
+    REVERSE_DIAGONAL_ID = 'rd',
+    COLUMN_PREFIX = 'c',
+    ROW_PREFIX = 'r',
+    impossibleLines = [],
     minimumMovesToWin = (board.width * 2) - 1,
-    winner;
+    winner,
+    winningLine,
+    maxIndex = board.width - 1,
+    GET_SPACE_CL = {
+      'rd': function(index, position){
+        return {
+          row: index,
+          col: maxIndex - index
+        };
+      },
+      'd': function(index, position){
+        return {
+          row: index,
+          col: index
+        };
+      },
+      'c': function(index, position){
+        return {
+          row: index,
+          col: position.col
+        };
+      },
+      'r': function(index, position){
+        return {
+          row: position.row,
+          col: index
+        };
+      }
+    };
+
+  function getWinningLine(){
+    checkForWin(true);
+    return winningLine;
+  }
 
   function blankBoard(){
     return board.isBlank();
@@ -22,11 +60,14 @@ var GameState = function(config) {
       // causes slowness
       var newBoard = board.clone();
       newBoard.placePlayer(player, position);
-      return new GameState({
+      state = new GameState({
         board: newBoard,
         player: opponent,
         opponent: player
       });
+
+      state.winningLine();
+      return state
 
     }else{
       return this;
@@ -35,23 +76,19 @@ var GameState = function(config) {
 
   /*** check for winning functions ***/
   function didIWin(piece){
-    return checkForWin(piece);
+    return winner ? winner.indexOf(piece) >= 0 : false;
   }
 
   function didILose(piece){
-    return !isDraw() && !checkForWin(piece);
+    return winner && winner.indexOf(piece) >= 0;
   }
 
 
   function isWon() {
-    return checkForWin(player) || checkForWin(opponent);
+    return !winner;
   }
 
-  function isLost(){
-    return isWon();
-  }
-
-  function isDraw() {
+  function isDraw(piece) {
     // no empty spaces and no winner
     return board.getEmptySpaces().length === 0 && !isWon();
   }
@@ -64,111 +101,98 @@ var GameState = function(config) {
     return board.getEmptySpaces().pop();
   }
 
-  function winningRow(piece){
-    var count = 0,
-      i = 0;
+  function checkLine(space, line_id, gatherLine, spaceFunc){
+    var i = 0,
+      candidate,
+      line = [];
 
-    for( ; i < board.width; i++){
-      var j = 0;
-      for(; j < board.width; j++){
-        var occupiedBy = board.whosThere({
-          row: i, col: j
-        });
-
-        if(occupiedBy && occupiedBy.indexOf(piece) !== -1){
-          count++;
-        }
-
-        if(count === board.width){
-          winner = piece;
-          return true;
-        }
-      }
-      // finished row, reset count
-      count = 0;
+    if(_.contains(impossibleLines, line_id)){
+      return;
     }
 
-    return false;
-  }
-
-  function winningColumn(piece){
-    var count = 0,
-      i = 0;
-
-    for( ; i < board.width; i++){
-      var j = 0;
-      for(; j < board.width; j++){
-        var occupiedBy = board.whosThere({
-          row: j, col: i
-        });
-
-        if(occupiedBy && occupiedBy.indexOf(piece) !== -1){
-          count++;
-        }
-
-        if(count === board.width){
-          winner = piece;
-          return true;
-        }
-      }
-      // finished column reset count
-      count = 0;
+    candidate = board.whosThere(space);
+    if(!candidate){
+      return;
     }
 
-    return false;
-  }
+    line.push(space);
 
-  function winningDiagonal(piece){
-    var count = 0,
-      i = 0;
+    for(; i < maxIndex; i++){
+      var testSpace = spaceFunc(i, space),
+          newCandidate = board.whosThere(testSpace);
 
-    for(; i < board.width; i++){
-      var occupiedBy = board.whosThere({
-        row: i,
-        col: i
-      });
-
-      if(occupiedBy && occupiedBy.indexOf(piece) !== -1){
-        count++;
+      if(candidate.indexOf(newCandidate) === -1){
+        impossibleLines.push(line_id);
+        return;
       }
 
-      if(count === board.width){
-        winner = piece;
-        return true;
+      if(gatherLine){
+        line.push([i, board.width - i]);
       }
     }
 
-    return false;
+    if(gatherLine){
+      winningLine = line;
+    }
+    return candidate;
   }
 
-  function winningRevDiagonal(piece){
-    var count = 0,
-      i = 0;
+  function winningDiagonal(gatherLine){
+    return checkLine(
+      { row: 0, col: 0},
+      DIAGONAL_ID,
+      gatherLine,
+      GET_SPACE_CL[DIAGONAL_ID]
+    );
+  }
 
-      for(; i < board.width; i++){
-        var occupiedBy = board.whosThere({
-          row: i,
-          col: board.width - i - 1
-        });
+  function winningRevDiagonal(gatherLine){
+    return checkLine(
+      { row: 0, col: maxIndex},
+      REVERSE_DIAGONAL_ID, gatherLine,
+      GET_SPACE_CL[REVERSE_DIAGONAL_ID]
+    );
+  }
 
-        if(occupiedBy && occupiedBy.indexOf(piece) !== -1){
-          count ++;
-        }
+  function winningColumn(gatherLine){
+    var i = 0;
 
-        if(count === board.width){
-          winner = piece;
-          return true;
-        }
+    for(; i < maxIndex; i++){
+      var win = checkLine(
+        { row: 0, col: i},
+        COLUMN_PREFIX + i,
+        gatherLine,
+        GET_SPACE_CL[COLUMN_PREFIX]
+      );
+      if(win){
+        return win;
       }
-
-      return false;
+    }
   }
 
-  function checkForWin(piece){
-      return winningRow(piece) ||
-        winningColumn(piece) ||
-        winningDiagonal(piece) ||
-        winningRevDiagonal(piece);
+  function winningRow(gatherLine){
+    var i = 0;
+
+    for(; i < maxIndex; i++){
+      var win = checkLine(
+        { row: i, col: 0},
+        ROW_PREFIX + i,
+        gatherLine,
+        GET_SPACE_CL[ROW_PREFIX]
+      );
+      if(win){
+        return win;
+      }
+    }
+  }
+
+  function checkForWin(gatherLine){
+    if(board.occupiedSpaces() < minimumMovesToWin){
+      winner = winningRow(gatherLine) ||
+        winningColumn(gatherLine) ||
+        winningDiagonal(gatherLine) ||
+        winningRevDiagonal(gatherLine);
+    }
   }
 
   function availableMoves(){
@@ -200,12 +224,12 @@ var GameState = function(config) {
   }
 
   return {
+    winningLine: getWinningLine,
     blankBoard: blankBoard,
     didIWin: didIWin,
     didILose: didILose,
     isWon: isWon,
     isDraw: isDraw,
-    isLost: isLost,
     currentPlayer: currentPlayer,
     currentOpponent: currentOpponent,
     availableMoves: availableMoves,

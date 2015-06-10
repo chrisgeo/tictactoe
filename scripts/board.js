@@ -35,6 +35,10 @@ var Board = function (config){
       return newObj;
     }
 
+    function occupiedSpaces() {
+      return config.spaces - emptySpacesLeft;
+    }
+
     function anyEmptySpaces() {
       return emptySpacesLeft !== 0;
     }
@@ -58,7 +62,7 @@ var Board = function (config){
     }
 
     function whosThere (position) {
-        return gameBoard[position.row][position.col];
+      return gameBoard[position.row][position.col];
     }
 
 

@@ -96,7 +96,6 @@ describe('GameState', function () {
     assert.equal(false, state.didIWin('x'));
     assert.equal(false, state.didIWin('o'));
     assert.equal(false, state.isWon());
-    assert.equal(false, state.isLost());
     assert.equal(false, state.isDraw());
 
     assert.equal(9, state.availableMoves());
@@ -182,7 +181,6 @@ describe('GameState', function () {
     assert.equal(true, state.didILose('x'), 'X should lose');
     assert.equal(true, state.didIWin('o'), 'O should win.');
     assert.equal(false, state.didILose('o'), 'O should not lose');
-    assert.equal(true, state.isLost());
     assert.equal(false, state.isDraw());
     assert.equal(true, state.isWon());
     assert.equal(true, state.gameOver());
@@ -210,7 +208,6 @@ describe('GameState', function () {
     assert.equal(false, state.didILose('o'), "O should not lose :: \n" );
     assert.equal(false, state.didILose('x'), "X should not lose, didILose :: \n" );
     assert.equal(false, state.isWon(), 'Game should not be won');
-    assert.equal(false, state.isLost(), 'Game should not be lost');
     assert.equal(true, state.isDraw(), 'Game should be a draw');
     assert.equal(true, state.gameOver(), 'Game should be over');
   });
